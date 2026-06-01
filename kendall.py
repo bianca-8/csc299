@@ -7,9 +7,7 @@ post = pd.read_csv("surveys/post.csv", skiprows=[1,2])
 
 # likert questions
 like_qs = [
-    "Q23_1","Q23_2","Q23_3","Q23_4",
-    "Q23_5","Q23_6","Q23_7","Q23_8",
-    "Q25_1","Q25_2","Q25_3"
+    "Q23_1","Q23_2","Q23_3","Q23_4","Q23_5","Q23_6","Q23_7","Q23_8","Q25_1","Q25_2","Q25_3"
 ]
 
 # confidence questions

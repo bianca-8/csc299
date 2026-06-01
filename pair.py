@@ -5,6 +5,11 @@ post = pd.read_csv("surveys/post_raw.csv", skiprows=[1])
 
 FIRST = "RecipientFirstName"
 LAST = "RecipientLastName"
+CONSENT = "Q1"
+AGREE = "I agree to have the data I provide be analyzed as part of this study"
+
+def consented(df, i):
+    return df[CONSENT][i] == AGREE
 
 for df in [pre, post]:
     df[FIRST] = df[FIRST].str.strip()
@@ -32,48 +37,51 @@ matched = {}
 unmatched_post = []
 unmatched_pre = []
 
-# unmatched post
+# match + unmatched post
 for i in range(len(post)):
     name = get_name(post, i)
-    if name in index:
-        matched[name] = (index[name], i)
+    if name in index: #
+        pre_i = index[name] #
+        if consented(pre, pre_i) and consented(post, i): #
+            matched[name] = (index[name], i)
     else:
-        unmatched_post.append(i)
+        if consented(post, i): #
+            unmatched_post.append(i)
 
 # unmatched pre
 for i in range(len(pre)):
     name = get_name(pre, i)
-    if name not in matched:
+    if name not in matched and consented(pre, i): # second part
         unmatched_pre.append(i)
 
 # print matched pairs
-for name, (pre_i, post_i) in matched.items():
-    print(pre[pre_i:pre_i+1])
-    print(post[post_i:post_i+1])
-    print("\n")
+# for name, (pre_i, post_i) in matched.items():
+#     print(pre[pre_i:pre_i+1])
+#     print(post[post_i:post_i+1])
+#     # print("\n")
  
 # print unmatched
-print("------ Unmatched Pre ------")
-for i in unmatched_pre:
-    print(pre[i:i+1])
+# print("------ Unmatched Pre ------")
+# for i in unmatched_pre:
+#     print(pre[i:i+1])
  
-print("\n------ Unmatched Post ------")
-for i in unmatched_post:
-    print(post[i:i+1])
+# print("\n------ Unmatched Post ------")
+# for i in unmatched_post:
+#     print(post[i:i+1])
 
 # save CSV
 rows = []
 for name, (pre_i, post_i) in matched.items():
     rows.append(pre[pre_i:pre_i+1])
     rows.append(post[post_i:post_i+1])
-    rows.append(pd.DataFrame([{}]))
+    # rows.append(pd.DataFrame([{}]))
 
-rows.append(pd.DataFrame([{}]))
-for i in unmatched_pre:
-    rows.append(pre[i:i+1])
+# rows.append(pd.DataFrame([{}]))
+# for i in unmatched_pre:
+#     rows.append(pre[i:i+1])
 
-rows.append(pd.DataFrame([{}]))
-for i in unmatched_post:
-    rows.append(post[i:i+1])
+# rows.append(pd.DataFrame([{}]))
+# for i in unmatched_post:
+#     rows.append(post[i:i+1])
 
-pd.concat(rows).to_csv("pair_output.csv", index=False)
+pd.concat(rows).to_csv("pair_agree.csv", index=False)
